@@ -1,1 +1,22 @@
+/* Custom CSS Styles */
+body {
+    background-color: #121212;
+    color: #e7e5e4;
+}
 
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #1c1917;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #44403c;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #78716c;
+}
