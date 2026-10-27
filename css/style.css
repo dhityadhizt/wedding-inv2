@@ -1,63 +1,34 @@
-/* Custom CSS Styles */
 body {
     background-color: #020617;
     color: #f8fafc;
 }
 
-/* Custom Scrollbar Blue Theme */
-::-webkit-scrollbar {
-    width: 8px;
-}
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: #090d16; }
+::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #0284c7; }
 
-::-webkit-scrollbar-track {
-    background: #090d16;
-}
-
-::-webkit-scrollbar-thumb {
-    background: #1e293b;
-    border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-    background: #0284c7;
-}
-
-/* 3D Motion Sticker Keyframe Animations */
 @keyframes floatSlow {
-    0%, 100% {
-        transform: translateY(0px) rotate(0deg);
-    }
-    50% {
-        transform: translateY(-15px) rotate(3deg);
-    }
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    50% { transform: translateY(-15px) rotate(3deg); }
 }
 
 @keyframes floatReverse {
-    0%, 100% {
-        transform: translateY(0px) rotate(0deg);
-    }
-    50% {
-        transform: translateY(12px) rotate(-4deg);
-    }
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    50% { transform: translateY(12px) rotate(-4deg); }
 }
 
 .sticker-element {
     animation: floatSlow 6s ease-in-out infinite;
     transform-style: preserve-3d;
 }
-
 .sticker-element:nth-child(even) {
     animation: floatReverse 7s ease-in-out infinite;
 }
 
-/* Pulse Glow & Shimmer Animation */
 @keyframes glowPulse {
-    0%, 100% {
-        box-shadow: 0 10px 40px -10px rgba(2, 132, 199, 0.4);
-    }
-    50% {
-        box-shadow: 0 20px 60px -5px rgba(56, 189, 248, 0.6);
-    }
+    0%, 100% { box-shadow: 0 10px 40px -10px rgba(2, 132, 199, 0.3); }
+    50% { box-shadow: 0 20px 60px -5px rgba(56, 189, 248, 0.5); }
 }
 
 #welcome-card {
