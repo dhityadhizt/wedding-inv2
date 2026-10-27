@@ -1,241 +1,229 @@
-// Initialize AOS Animation
-AOS.init({
-    duration: 1000,
-    once: true
-});
+// --- URL WEB APP GOOGLE APPS SCRIPT ANDA ---
+const SCRIPT_URL = "PASTE_URL_WEB_APP_GOOGLE_APPS_SCRIPT_DISINI";
 
-// Dynamic Guest Name from URL parameters (?to=Nama+Tamu)
+AOS.init({ duration: 1000, once: true });
+
 window.addEventListener('DOMContentLoaded', () => {
+    // Tangkap Nama Tamu dari URL (?to=Nama+Tamu)
     const urlParams = new URLSearchParams(window.location.search);
     const guestName = urlParams.get('to');
     const guestNameElement = document.getElementById('guest-name');
     
     if (guestName) {
-        guestNameElement.textContent = decodeURIComponent(guestName);
-        document.getElementById('rsvp-name').value = decodeURIComponent(guestName);
-        document.getElementById('gb-name').value = decodeURIComponent(guestName);
+        const decodedName = decodeURIComponent(guestName);
+        guestNameElement.textContent = decodedName;
+        document.getElementById('rsvp-name').value = decodedName;
+        document.getElementById('gb-name').value = decodedName;
     } else {
         guestNameElement.textContent = "Bapak/Ibu/Saudara/i";
     }
 
-    // Inisialisasi Efek 3D Parallax Mouse Motion & Falling Petals Canvas
     init3DStickerParallax();
     initPetalCanvas();
+    fetchWeddingData();
+    fetchComments();
 });
 
-/* -------------------------------------------------------------
-   3D MOTION & PARALLAX EFFECT UNTUK STICKER BUNGA WELCOME SCREEN
----------------------------------------------------------------- */
+// Ambil Data Konten dari Google Sheets
+async function fetchWeddingData() {
+    if (SCRIPT_URL.includes("PASTE_URL")) return;
+    try {
+        const response = await fetch(`${SCRIPT_URL}?action=getData`);
+        const result = await response.json();
+        if (result.status === "success") {
+            const d = result.data;
+            document.getElementById('cover-couple-names').textContent = `${d.groom_name_short} & ${d.bride_name_short}`;
+            document.getElementById('cover-wedding-date').textContent = d.wedding_date;
+            document.getElementById('hero-couple-names').textContent = `${d.groom_name_short} & ${d.bride_name_short}`;
+            document.getElementById('hero-wedding-date').textContent = d.wedding_date;
+            
+            document.getElementById('groom-name').textContent = d.groom_fullname;
+            document.getElementById('groom-parents').textContent = `Putra dari ${d.groom_parents}`;
+            if (d.groom_photo) document.getElementById('groom-img').src = d.groom_photo;
+
+            document.getElementById('bride-name').textContent = d.bride_fullname;
+            document.getElementById('bride-parents').textContent = `Putri dari ${d.bride_parents}`;
+            if (d.bride_photo) document.getElementById('bride-img').src = d.bride_photo;
+
+            document.getElementById('akad-date').innerHTML = `<i class="fa-regular fa-calendar-days text-ice-400 mr-2"></i> ${d.akad_date}`;
+            document.getElementById('akad-time').innerHTML = `<i class="fa-regular fa-clock text-ice-400 mr-2"></i> ${d.akad_time}`;
+            document.getElementById('akad-location').textContent = d.akad_location;
+            document.getElementById('akad-map-btn').href = d.akad_map_link;
+
+            document.getElementById('resepsi-date').innerHTML = `<i class="fa-regular fa-calendar-days text-ice-400 mr-2"></i> ${d.resepsi_date}`;
+            document.getElementById('resepsi-time').innerHTML = `<i class="fa-regular fa-clock text-ice-400 mr-2"></i> ${d.resepsi_time}`;
+            document.getElementById('resepsi-location').textContent = d.resepsi_location;
+            document.getElementById('resepsi-map-btn').href = d.resepsi_map_link;
+
+            document.getElementById('bank-name').textContent = d.bank_name;
+            document.getElementById('bank-acc').textContent = d.bank_acc_number;
+            document.getElementById('bank-owner').textContent = `a.n. ${d.bank_acc_holder}`;
+            document.getElementById('footer-couple').textContent = `${d.groom_name_short} & ${d.bride_name_short}`;
+
+            startCountdown(d.countdown_target);
+        }
+    } catch (e) { console.log("Gagal memuat data dari spreadsheet:", e); }
+}
+
+// Ambil Komentar/Buku Tamu dari Google Sheets
+async function fetchComments() {
+    if (SCRIPT_URL.includes("PASTE_URL")) return;
+    try {
+        const response = await fetch(`${SCRIPT_URL}?action=getComments`);
+        const result = await response.json();
+        if (result.status === "success") {
+            const container = document.getElementById('comments-container');
+            container.innerHTML = "";
+            result.comments.forEach(c => {
+                const div = document.createElement('div');
+                div.className = "bg-slate-900 p-6 rounded-2xl border border-slate-800";
+                div.innerHTML = `
+                    <div class="flex justify-between items-center mb-2">
+                        <h4 class="font-bold text-ice-200">${escapeHtml(c.name)}</h4>
+                        <span class="text-xs text-slate-500">${c.date}</span>
+                    </div>
+                    <p class="text-slate-300 text-sm">${escapeHtml(c.message)}</p>
+                `;
+                container.appendChild(div);
+            });
+        }
+    } catch (e) { console.log("Gagal memuat komentar:", e); }
+}
+
+// 3D Parallax & Petal Canvas
 function init3DStickerParallax() {
-    const cover = document.getElementById('cover');
-    const card = document.getElementById('welcome-card');
-    const stickers = document.querySelectorAll('.sticker-element');
-
+    const cover = document.getElementById('cover'), card = document.getElementById('welcome-card'), stickers = document.querySelectorAll('.sticker-element');
     if (!cover || !card) return;
-
     cover.addEventListener('mousemove', (e) => {
-        const { clientX, clientY } = e;
-        const { innerWidth, innerHeight } = window;
-
-        // Calculate offset values (-0.5 to 0.5)
-        const x = (clientX / innerWidth) - 0.5;
-        const y = (clientY / innerHeight) - 0.5;
-
-        // 3D Tilt Card Effect
-        card.style.transform = `perspective(1000px) rotateY(${x * 12}deg) rotateX(${-y * 12}deg) translateZ(10px)`;
-
-        // Parallax Floating Stickers Effect
-        stickers.forEach((sticker) => {
-            const depth = parseFloat(sticker.getAttribute('data-depth')) || 0.05;
-            const moveX = x * depth * 300;
-            const moveY = y * depth * 300;
-            sticker.style.transform = `translate3d(${moveX}px, ${moveY}px, 0px) rotate(${moveX * 0.05}deg)`;
+        const x = (e.clientX / window.innerWidth) - 0.5, y = (e.clientY / window.innerHeight) - 0.5;
+        card.style.transform = `perspective(1000px) rotateY(${x * 10}deg) rotateX(${-y * 10}deg)`;
+        stickers.forEach(s => {
+            const depth = parseFloat(s.getAttribute('data-depth')) || 0.05;
+            s.style.transform = `translate3d(${x * depth * 300}px, ${y * depth * 300}px, 0px)`;
         });
     });
-
-    // Reset position on mouse leave
     cover.addEventListener('mouseleave', () => {
-        card.style.transform = `perspective(1000px) rotateY(0deg) rotateX(0deg) translateZ(0px)`;
-        stickers.forEach((sticker) => {
-            sticker.style.transform = `translate3d(0px, 0px, 0px)`;
-        });
+        card.style.transform = `perspective(1000px) rotateY(0deg) rotateX(0deg)`;
+        stickers.forEach(s => s.style.transform = `translate3d(0,0,0)`);
     });
 }
 
-/* -------------------------------------------------------------
-   CANVAS ANIMATION: KELOPAK BUNGA GUGUR (PETAL FALL ANIMATION)
----------------------------------------------------------------- */
 function initPetalCanvas() {
     const canvas = document.getElementById('cover-petal-canvas');
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
+    let w = canvas.width = window.innerWidth, h = canvas.height = window.innerHeight;
+    window.addEventListener('resize', () => { w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight; });
+    
+    const petals = Array.from({length: 20}, () => ({
+        x: Math.random() * w, y: Math.random() * h - h, size: Math.random() * 8 + 5,
+        speedY: Math.random() * 1 + 0.5, speedX: Math.random() * 0.6 - 0.3, rot: Math.random() * 360
+    }));
 
-    let width = (canvas.width = window.innerWidth);
-    let height = (canvas.height = window.innerHeight);
-
-    window.addEventListener('resize', () => {
-        width = canvas.width = window.innerWidth;
-        height = canvas.height = window.innerHeight;
-    });
-
-    const numPetals = 25;
-    const petals = [];
-
-    // Color Palette: White & Soft Blue tones
-    const colors = ['rgba(255, 255, 255, 0.7)', 'rgba(186, 230, 253, 0.8)', 'rgba(147, 197, 253, 0.6)'];
-
-    for (let i = 0; i < numPetals; i++) {
-        petals.push({
-            x: Math.random() * width,
-            y: Math.random() * height - height,
-            size: Math.random() * 8 + 6,
-            speedY: Math.random() * 1.2 + 0.8,
-            speedX: Math.random() * 0.8 - 0.4,
-            rotation: Math.random() * 360,
-            rotSpeed: Math.random() * 1 - 0.5,
-            color: colors[Math.floor(Math.random() * colors.length)]
+    function animate() {
+        ctx.clearRect(0, 0, w, h);
+        petals.forEach(p => {
+            p.y += p.speedY; p.x += p.speedX; p.rot += 1;
+            if (p.y > h + 10) { p.y = -10; p.x = Math.random() * w; }
+            ctx.save(); ctx.translate(p.x, p.y); ctx.rotate((p.rot * Math.PI) / 180);
+            ctx.fillStyle = 'rgba(224, 242, 254, 0.7)';
+            ctx.fillRect(0, 0, p.size, p.size);
+            ctx.restore();
         });
+        requestAnimationFrame(animate);
     }
-
-    function drawPetal(p) {
-        ctx.save();
-        ctx.translate(p.x, p.y);
-        ctx.rotate((p.rotation * Math.PI) / 180);
-        ctx.fillStyle = p.color;
-        
-        ctx.beginPath();
-        ctx.moveTo(0, -p.size);
-        ctx.bezierCurveTo(p.size, -p.size / 2, p.size, p.size / 2, 0, p.size);
-        ctx.bezierCurveTo(-p.size, p.size / 2, -p.size, -p.size / 2, 0, -p.size);
-        ctx.fill();
-
-        ctx.restore();
-    }
-
-    function update() {
-        ctx.clearRect(0, 0, width, height);
-
-        petals.forEach((p) => {
-            p.y += p.speedY;
-            p.x += Math.sin(p.y * 0.01) + p.speedX;
-            p.rotation += p.rotSpeed;
-
-            if (p.y > height + 20) {
-                p.y = -20;
-                p.x = Math.random() * width;
-            }
-
-            drawPetal(p);
-        });
-
-        requestAnimationFrame(update);
-    }
-
-    update();
+    animate();
 }
 
-/* -------------------------------------------------------------
-   OPEN INVITATION & AUDIO CONTROLS
----------------------------------------------------------------- */
-const cover = document.getElementById('cover');
-const mainContent = document.getElementById('main-content');
-const floatingControls = document.getElementById('floating-controls');
-const openBtn = document.getElementById('open-invitation');
-const bgMusic = document.getElementById('bg-music');
-const musicToggle = document.getElementById('music-toggle');
-const musicIcon = document.getElementById('music-icon');
+// Countdown
+function startCountdown(dateString) {
+    const target = new Date(dateString || "November 15, 2026 08:00:00").getTime();
+    setInterval(() => {
+        const now = new Date().getTime(), dist = target - now;
+        if (dist < 0) return;
+        document.getElementById('days').innerText = String(Math.floor(dist / (1000 * 60 * 60 * 24))).padStart(2, '0');
+        document.getElementById('hours').innerText = String(Math.floor((dist % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))).padStart(2, '0');
+        document.getElementById('minutes').innerText = String(Math.floor((dist % (1000 * 60 * 60)) / (1000 * 60))).padStart(2, '0');
+        document.getElementById('seconds').innerText = String(Math.floor((dist % (1000 * 60)) / 1000)).padStart(2, '0');
+    }, 1000);
+}
 
+// Buka Undangan & Musik
+const cover = document.getElementById('cover'), mainContent = document.getElementById('main-content'), floatingControls = document.getElementById('floating-controls'), bgMusic = document.getElementById('bg-music'), musicIcon = document.getElementById('music-icon');
 let isPlaying = false;
 
-openBtn.addEventListener('click', () => {
+document.getElementById('open-invitation').addEventListener('click', () => {
     cover.style.opacity = '0';
-    cover.style.transform = 'scale(1.05)';
     setTimeout(() => {
         cover.style.display = 'none';
         mainContent.style.opacity = '1';
         floatingControls.style.display = 'flex';
-        
-        // Play Audio
         bgMusic.play().then(() => {
             isPlaying = true;
-            musicIcon.classList.remove('fa-music');
-            musicIcon.classList.add('fa-compact-disc', 'fa-spin');
-        }).catch(err => {
-            console.log("Audio autoplay restricted:", err);
-        });
+            musicIcon.classList.replace('fa-music', 'fa-compact-disc');
+            musicIcon.classList.add('fa-spin');
+        }).catch(e => console.log("Autoplay blocked"));
     }, 1000);
 });
 
-// Music Toggle Handler
-musicToggle.addEventListener('click', () => {
+document.getElementById('music-toggle').addEventListener('click', () => {
     if (isPlaying) {
-        bgMusic.pause();
-        isPlaying = false;
-        musicIcon.classList.remove('fa-compact-disc', 'fa-spin');
-        musicIcon.classList.add('fa-music');
+        bgMusic.pause(); isPlaying = false;
+        musicIcon.classList.replace('fa-compact-disc', 'fa-music'); musicIcon.classList.remove('fa-spin');
     } else {
-        bgMusic.play();
-        isPlaying = true;
-        musicIcon.classList.remove('fa-music');
-        musicIcon.classList.add('fa-compact-disc', 'fa-spin');
+        bgMusic.play(); isPlaying = true;
+        musicIcon.classList.replace('fa-music', 'fa-compact-disc'); musicIcon.classList.add('fa-spin');
     }
 });
 
-/* -------------------------------------------------------------
-   COUNTDOWN TIMER
----------------------------------------------------------------- */
-const weddingDate = new Date("November 15, 2026 08:00:00").getTime();
+// Submit RSVP ke Google Sheets
+document.getElementById('rsvp-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = document.getElementById('rsvp-submit-btn');
+    btn.textContent = "Mengirim..."; btn.disabled = true;
 
-const timer = setInterval(() => {
-    const now = new Date().getTime();
-    const distance = weddingDate - now;
+    const data = {
+        type: "rsvp",
+        name: document.getElementById('rsvp-name').value,
+        status: document.getElementById('rsvp-status').value,
+        jumlah: document.getElementById('rsvp-jumlah').value
+    };
 
-    if (distance < 0) {
-        clearInterval(timer);
-        return;
+    try {
+        await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) });
+        alert("Konfirmasi kehadiran berhasil dikirim!");
+        e.target.reset();
+    } catch (err) {
+        alert("Terjadi kesalahan koneksi.");
+    } finally {
+        btn.textContent = "Kirim Konfirmasi"; btn.disabled = false;
     }
-
-    const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-    document.getElementById('days').innerText = String(days).padStart(2, '0');
-    document.getElementById('hours').innerText = String(hours).padStart(2, '0');
-    document.getElementById('minutes').innerText = String(minutes).padStart(2, '0');
-    document.getElementById('seconds').innerText = String(seconds).padStart(2, '0');
-}, 1000);
-
-/* -------------------------------------------------------------
-   RSVP & GUESTBOOK HANDLERS
----------------------------------------------------------------- */
-document.getElementById('rsvp-form').addEventListener('submit', (e) => {
-    e.preventDefault();
-    const name = document.getElementById('rsvp-name').value;
-    const status = document.getElementById('rsvp-status').value;
-    const jumlah = document.getElementById('rsvp-jumlah').value;
-    
-    alert(`Terima kasih ${name}, konfirmasi kehadiran Anda (${status}, ${jumlah} orang) berhasil dikirim!`);
-    e.target.reset();
 });
 
-document.getElementById('guestbook-form').addEventListener('submit', (e) => {
+// Submit Ucapan Buku Tamu ke Google Sheets
+document.getElementById('guestbook-form').addEventListener('submit', async (e) => {
     e.preventDefault();
-    const name = document.getElementById('gb-name').value;
-    const message = document.getElementById('gb-message').value;
-    
-    const container = document.getElementById('comments-container');
-    const newComment = document.createElement('div');
-    newComment.className = "bg-slate-900 p-6 rounded-2xl border border-slate-800 animate-fade-in";
-    newComment.innerHTML = `
-        <div class="flex justify-between items-center mb-2">
-            <h4 class="font-bold text-sky-200">${name}</h4>
-            <span class="text-xs text-slate-500">Baru saja</span>
-        </div>
-        <p class="text-slate-300 text-sm">${message}</p>
-    `;
-    
-    container.prepend(newComment);
-    e.target.reset();
-    alert("Ucapan dan doa berhasil dikirim!");
+    const btn = document.getElementById('gb-submit-btn');
+    btn.textContent = "Mengirim..."; btn.disabled = true;
+
+    const data = {
+        type: "guestbook",
+        name: document.getElementById('gb-name').value,
+        message: document.getElementById('gb-message').value
+    };
+
+    try {
+        await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) });
+        alert("Ucapan berhasil dikirim!");
+        e.target.reset();
+        setTimeout(fetchComments, 1500);
+    } catch (err) {
+        alert("Terjadi kesalahan koneksi.");
+    } finally {
+        btn.textContent = "Kirim Ucapan"; btn.disabled = false;
+    }
 });
+
+function escapeHtml(text) {
+    return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
