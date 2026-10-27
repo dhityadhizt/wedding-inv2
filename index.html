@@ -6,38 +6,137 @@
     <title>The Wedding of Ditya & Diva</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0f7ff',
+                            100: '#e0effe',
+                            200: '#bae0fd',
+                            300: '#7cc5fb',
+                            400: '#36a9f7',
+                            500: '#0c8de4',
+                            600: '#0270c1',
+                            700: '#03599e',
+                            800: '#074c83',
+                            900: '#0c406e',
+                            950: '#082849',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
     <!-- AOS Animation Library -->
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,600;1,400&display=swap" rel="stylesheet">
     <!-- Custom CSS -->
     <link rel="stylesheet" href="css/style.css">
 </head>
-<body class="bg-stone-900 text-stone-100 font-['Plus_Jakarta_Sans',sans-serif] selection:bg-amber-600 selection:text-white">
+<body class="bg-slate-950 text-slate-100 font-['Plus_Jakarta_Sans',sans-serif] selection:bg-brand-500 selection:text-white overflow-x-hidden">
 
-    <!-- COVER / WELCOME SCREEN -->
-    <section id="cover" class="fixed inset-0 z-50 flex items-center justify-center bg-stone-950 px-4 transition-opacity duration-1000">
-        <div class="absolute inset-0 opacity-25 bg-[radial-gradient(#d4af37_1px,transparent_1px)] [background-size:16px_16px]"></div>
-        <div class="relative z-10 text-center max-w-md w-full bg-stone-900/80 backdrop-blur-md p-8 rounded-3xl border border-amber-500/30 shadow-2xl">
-            <span class="text-amber-400 text-sm tracking-[0.2em] uppercase font-medium">The Wedding Of</span>
-            <h1 class="font-['Great_Vibes',cursive] text-6xl my-4 text-amber-200">Ditya & Diva</h1>
-            
-            <div class="my-6 p-4 bg-stone-800/60 rounded-2xl border border-stone-700/50">
-                <p class="text-xs text-stone-400 uppercase tracking-widest mb-1">Kepada Yth. Bapak/Ibu/Saudara/i</p>
-                <h3 id="guest-name" class="text-lg font-semibold text-amber-100">Tamu Undangan</h3>
+    <!-- WELCOME / COVER SCREEN (3D MOTION STICKER BLUE & WHITE THEME) -->
+    <section id="cover" class="fixed inset-0 z-50 flex items-center justify-center overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-blue-950 px-4 transition-all duration-1000">
+        
+        <!-- Canvas Background Animasi Kelopak Bunga Gugur -->
+        <canvas id="cover-petal-canvas" class="absolute inset-0 pointer-events-none z-0"></canvas>
+
+        <!-- Dynamic Ambient Light Blobs -->
+        <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-500/20 rounded-full filter blur-[100px] animate-pulse"></div>
+        <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-sky-300/15 rounded-full filter blur-[100px] animate-pulse" style="animation-delay: 2s;"></div>
+
+        <!-- 3D FLOATING FLOWER STICKERS (INTERACTIVE PARALLAX LAYER) -->
+        <div id="sticker-layer" class="absolute inset-0 pointer-events-none z-10 overflow-hidden">
+            <!-- Top Left Floral Sticker -->
+            <div class="sticker-element absolute -top-10 -left-10 w-44 md:w-64 opacity-95 transition-transform duration-200 ease-out" data-depth="0.05">
+                <svg viewBox="0 0 200 200" class="w-full h-full drop-shadow-[0_15px_15px_rgba(0,0,0,0.5)]">
+                    <circle cx="100" cy="100" r="80" fill="#ffffff" opacity="0.1" />
+                    <!-- White & Blue 3D Flower Petals -->
+                    <path d="M100 20 C110 50, 150 50, 150 100 C150 150, 110 150, 100 180 C90 150, 50 150, 50 100 C50 50, 90 50, 100 20 Z" fill="#ffffff" class="filter drop-shadow" />
+                    <path d="M20 100 C50 110, 50 150, 100 150 C150 150, 150 110, 180 100 C150 90, 150 50, 100 50 C50 50, 50 90, 20 100 Z" fill="#93c5fd" opacity="0.9" />
+                    <circle cx="100" cy="100" r="22" fill="#38bdf8" />
+                    <circle cx="100" cy="100" r="14" fill="#ffffff" />
+                </svg>
             </div>
 
-            <button id="open-invitation" class="w-full py-3.5 px-6 bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-500 hover:to-amber-600 text-stone-950 font-bold rounded-xl shadow-lg shadow-amber-900/40 transition-all transform hover:scale-[1.02] flex items-center justify-center gap-2">
-                <i class="fa-solid fa-envelope-open-text"></i> Buka Undangan
+            <!-- Top Right Floral Sticker -->
+            <div class="sticker-element absolute -top-6 -right-6 w-36 md:w-56 opacity-90 transition-transform duration-200 ease-out" data-depth="-0.08">
+                <svg viewBox="0 0 200 200" class="w-full h-full drop-shadow-[0_12px_20px_rgba(14,165,233,0.3)]">
+                    <path d="M100 30 Q140 70 170 100 Q140 130 100 170 Q60 130 30 100 Q60 70 100 30 Z" fill="#e0f2fe" />
+                    <circle cx="100" cy="100" r="30" fill="#0284c7" />
+                    <circle cx="100" cy="100" r="18" fill="#ffffff" />
+                </svg>
+            </div>
+
+            <!-- Bottom Left Floral Sticker -->
+            <div class="sticker-element absolute -bottom-10 -left-6 w-40 md:w-60 opacity-90 transition-transform duration-200 ease-out" data-depth="-0.04">
+                <svg viewBox="0 0 200 200" class="w-full h-full drop-shadow-[0_20px_25px_rgba(0,0,0,0.6)]">
+                    <g transform="rotate(45 100 100)">
+                        <circle cx="100" cy="60" r="35" fill="#ffffff" />
+                        <circle cx="140" cy="100" r="35" fill="#bae6fd" />
+                        <circle cx="100" cy="140" r="35" fill="#ffffff" />
+                        <circle cx="60" cy="100" r="35" fill="#bae6fd" />
+                        <circle cx="100" cy="100" r="25" fill="#0369a1" />
+                    </g>
+                </svg>
+            </div>
+
+            <!-- Bottom Right Floral Sticker -->
+            <div class="sticker-element absolute -bottom-12 -right-10 w-48 md:w-72 opacity-95 transition-transform duration-200 ease-out" data-depth="0.07">
+                <svg viewBox="0 0 200 200" class="w-full h-full drop-shadow-[0_15px_30px_rgba(2,132,199,0.4)]">
+                    <path d="M100 10 C130 60, 190 60, 190 100 C190 140, 130 140, 100 190 C70 140, 10 140, 10 100 C10 60, 70 60, 100 10 Z" fill="#ffffff" />
+                    <circle cx="100" cy="100" r="30" fill="#38bdf8" />
+                </svg>
+            </div>
+
+            <!-- Small Floating Decorative Sparkles -->
+            <div class="sticker-element absolute top-1/3 left-8 text-sky-200/80 text-xl animate-bounce" data-depth="0.12"><i class="fa-solid fa-sparkles"></i>✦</div>
+            <div class="sticker-element absolute bottom-1/3 right-10 text-white/90 text-2xl animate-pulse" data-depth="-0.1"><i class="fa-solid fa-star"></i>✧</div>
+        </div>
+
+        <!-- MAIN 3D GLASS CARD -->
+        <div id="welcome-card" class="relative z-20 text-center max-w-md w-full bg-slate-900/60 backdrop-blur-xl p-8 md:p-10 rounded-3xl border border-white/20 shadow-[0_25px_60px_-15px_rgba(2,132,199,0.3)] transition-all duration-300 transform-gpu">
+            
+            <!-- Badge Sticker Acara -->
+            <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 border border-sky-300/30 text-sky-200 text-xs tracking-[0.2em] uppercase font-semibold mb-3 shadow-inner">
+                <span class="w-2 h-2 rounded-full bg-sky-400 animate-ping"></span>
+                The Wedding Celebration
+            </div>
+
+            <!-- Nama Mempelai -->
+            <h1 class="font-['Great_Vibes',cursive] text-6xl md:text-7xl my-2 bg-gradient-to-r from-white via-sky-100 to-sky-300 bg-clip-text text-transparent drop-shadow-[0_4px_10px_rgba(0,0,0,0.5)]">
+                Ditya & Diva
+            </h1>
+
+            <!-- Tanggal Acara -->
+            <p class="text-sky-200/90 font-['Playfair_Display',serif] italic text-sm tracking-wide mb-6">
+                <i class="fa-regular fa-calendar-check text-sky-400 mr-1.5"></i> Minggu, 15 November 2026
+            </p>
+
+            <!-- Box Tamu Undangan -->
+            <div class="my-6 p-4 bg-slate-800/50 rounded-2xl border border-sky-400/20 backdrop-blur-md relative overflow-hidden group">
+                <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+                <p class="text-[11px] text-slate-400 uppercase tracking-widest mb-1 font-medium">Kepada Yth. Bapak/Ibu/Saudara/i</p>
+                <h3 id="guest-name" class="text-xl font-bold text-white tracking-wide">Tamu Undangan</h3>
+            </div>
+
+            <!-- Tombol Buka Undangan 3D Motion -->
+            <button id="open-invitation" class="relative w-full py-4 px-6 bg-gradient-to-r from-sky-500 via-blue-600 to-indigo-600 hover:from-sky-400 hover:to-blue-500 text-white font-bold rounded-2xl shadow-[0_10px_25px_rgba(2,132,199,0.5)] transition-all duration-300 transform hover:-translate-y-1 active:translate-y-0 flex items-center justify-center gap-3 group overflow-hidden border border-white/20">
+                <span class="absolute inset-0 w-full h-full bg-white/20 transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></span>
+                <i class="fa-solid fa-envelope-open-text text-lg group-hover:scale-110 transition-transform"></i>
+                <span class="tracking-wider text-sm font-semibold">BUKA UNDANGAN</span>
             </button>
         </div>
     </section>
 
-    <!-- FLOATING MUSIC & NAVIGATION -->
+    <!-- FLOATING MUSIC CONTROL -->
     <div id="floating-controls" class="fixed bottom-6 right-6 z-40 hidden flex-col gap-3">
-        <button id="music-toggle" class="w-12 h-12 bg-amber-600 hover:bg-amber-500 text-stone-950 rounded-full shadow-lg flex items-center justify-center transition transform hover:scale-110">
+        <button id="music-toggle" class="w-12 h-12 bg-sky-600 hover:bg-sky-500 text-white rounded-full shadow-lg shadow-sky-900/50 flex items-center justify-center transition transform hover:scale-110 border border-white/20">
             <i id="music-icon" class="fa-solid fa-music"></i>
         </button>
     </div>
@@ -54,77 +153,77 @@
         <!-- HERO SECTION -->
         <header class="relative min-h-screen flex items-center justify-center text-center px-4 overflow-hidden">
             <div class="absolute inset-0 bg-cover bg-center brightness-40 scale-105" style="background-image: url('assets/images/hero-bg.jpg');"></div>
-            <div class="absolute inset-0 bg-gradient-to-t from-stone-900 via-transparent to-stone-900/60"></div>
+            <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-slate-950/70"></div>
             
             <div class="relative z-10 max-w-2xl mx-auto" data-aos="fade-up" data-aos-duration="1200">
-                <span class="text-amber-400 tracking-[0.3em] uppercase text-sm font-semibold">The Wedding Celebration</span>
-                <h1 class="font-['Great_Vibes',cursive] text-7xl md:text-8xl my-6 text-amber-200">Ditya & Diva</h1>
-                <p class="text-stone-300 text-lg mb-8">Minggu, 15 November 2026</p>
+                <span class="text-sky-400 tracking-[0.3em] uppercase text-sm font-semibold">The Wedding Celebration</span>
+                <h1 class="font-['Great_Vibes',cursive] text-7xl md:text-8xl my-6 text-sky-100">Ditya & Diva</h1>
+                <p class="text-slate-300 text-lg mb-8 font-['Playfair_Display',serif]">Minggu, 15 November 2026</p>
                 
                 <!-- COUNTDOWN TIMER -->
-                <div class="grid grid-cols-4 gap-3 max-w-md mx-auto bg-stone-900/70 backdrop-blur-md p-4 rounded-2xl border border-amber-500/20 shadow-xl">
-                    <div class="text-center"><span id="days" class="text-2xl font-bold text-amber-300">00</span><p class="text-[10px] uppercase text-stone-400 tracking-wider">Hari</p></div>
-                    <div class="text-center"><span id="hours" class="text-2xl font-bold text-amber-300">00</span><p class="text-[10px] uppercase text-stone-400 tracking-wider">Jam</p></div>
-                    <div class="text-center"><span id="minutes" class="text-2xl font-bold text-amber-300">00</span><p class="text-[10px] uppercase text-stone-400 tracking-wider">Menit</p></div>
-                    <div class="text-center"><span id="seconds" class="text-2xl font-bold text-amber-300">00</span><p class="text-[10px] uppercase text-stone-400 tracking-wider">Detik</p></div>
+                <div class="grid grid-cols-4 gap-3 max-w-md mx-auto bg-slate-900/70 backdrop-blur-md p-4 rounded-2xl border border-sky-500/20 shadow-xl">
+                    <div class="text-center"><span id="days" class="text-2xl font-bold text-sky-300">00</span><p class="text-[10px] uppercase text-slate-400 tracking-wider">Hari</p></div>
+                    <div class="text-center"><span id="hours" class="text-2xl font-bold text-sky-300">00</span><p class="text-[10px] uppercase text-slate-400 tracking-wider">Jam</p></div>
+                    <div class="text-center"><span id="minutes" class="text-2xl font-bold text-sky-300">00</span><p class="text-[10px] uppercase text-slate-400 tracking-wider">Menit</p></div>
+                    <div class="text-center"><span id="seconds" class="text-2xl font-bold text-sky-300">00</span><p class="text-[10px] uppercase text-slate-400 tracking-wider">Detik</p></div>
                 </div>
             </div>
         </header>
 
         <!-- COUPLE SECTION -->
-        <section class="py-24 px-4 bg-stone-900">
+        <section class="py-24 px-4 bg-slate-950">
             <div class="max-w-4xl mx-auto text-center">
-                <span class="text-amber-400 text-sm tracking-widest uppercase" data-aos="fade-up">Bride & Groom</span>
-                <h2 class="font-['Great_Vibes',cursive] text-5xl text-amber-200 mt-2 mb-6" data-aos="fade-up">Mempelai Bahagia</h2>
-                <p class="text-stone-400 max-w-xl mx-auto mb-16" data-aos="fade-up">"Dan di antara tanda-tanda kebesaran-Nya ialah Dia menciptakan pasangan-pasangan untukmu dari jenismu sendiri..." (QS. Ar-Rum: 21)</p>
+                <span class="text-sky-400 text-sm tracking-widest uppercase" data-aos="fade-up">Bride & Groom</span>
+                <h2 class="font-['Great_Vibes',cursive] text-5xl text-sky-100 mt-2 mb-6" data-aos="fade-up">Mempelai Bahagia</h2>
+                <p class="text-slate-400 max-w-xl mx-auto mb-16 italic font-['Playfair_Display',serif]" data-aos="fade-up">"Dan di antara tanda-tanda kebesaran-Nya ialah Dia menciptakan pasangan-pasangan untukmu dari jenismu sendiri..." (QS. Ar-Rum: 21)</p>
                 
                 <div class="grid md:grid-cols-2 gap-12 items-center">
                     <!-- Groom -->
-                    <div class="bg-stone-800/40 border border-stone-700/50 p-6 rounded-3xl text-center shadow-xl" data-aos="fade-right">
-                        <div class="w-48 h-48 mx-auto rounded-full overflow-hidden border-2 border-amber-500/40 mb-6 shadow-lg">
+                    <div class="bg-slate-900/50 border border-slate-800 p-6 rounded-3xl text-center shadow-xl backdrop-blur-sm" data-aos="fade-right">
+                        <div class="w-48 h-48 mx-auto rounded-full overflow-hidden border-4 border-sky-400/40 mb-6 shadow-lg shadow-sky-950">
                             <img src="assets/images/groom.jpg" alt="Ditya" class="w-full h-full object-cover">
                         </div>
-                        <h3 class="font-['Great_Vibes',cursive] text-4xl text-amber-200">Aditya Putera Prakosa</h3>
-                        <p class="text-sm text-stone-400 mt-2">Putra dari Bpk. ... & Ibu ...</p>
+                        <h3 class="font-['Great_Vibes',cursive] text-4xl text-sky-200">Aditya Putera Prakosa</h3>
+                        <p class="text-sm text-slate-400 mt-2">Putra dari Bpk. ... & Ibu ...</p>
                     </div>
 
                     <!-- Bride -->
-                    <div class="bg-stone-800/40 border border-stone-700/50 p-6 rounded-3xl text-center shadow-xl" data-aos="fade-left">
-                        <div class="w-48 h-48 mx-auto rounded-full overflow-hidden border-2 border-amber-500/40 mb-6 shadow-lg">
+                    <div class="bg-slate-900/50 border border-slate-800 p-6 rounded-3xl text-center shadow-xl backdrop-blur-sm" data-aos="fade-left">
+                        <div class="w-48 h-48 mx-auto rounded-full overflow-hidden border-4 border-sky-400/40 mb-6 shadow-lg shadow-sky-950">
                             <img src="assets/images/bride.jpg" alt="Diva" class="w-full h-full object-cover">
                         </div>
-                        <h3 class="font-['Great_Vibes',cursive] text-4xl text-amber-200">Diva Anjani</h3>
-                        <p class="text-sm text-stone-400 mt-2">Putri dari Bpk. ... & Ibu ...</p>
+                        <h3 class="font-['Great_Vibes',cursive] text-4xl text-sky-200">Diva Anjani</h3>
+                        <p class="text-sm text-slate-400 mt-2">Putri dari Bpk. ... & Ibu ...</p>
                     </div>
                 </div>
             </div>
         </section>
 
         <!-- EVENT DETAILS & MAPS -->
-        <section class="py-24 px-4 bg-stone-950 relative">
+        <section class="py-24 px-4 bg-slate-900 relative">
             <div class="max-w-4xl mx-auto text-center">
-                <span class="text-amber-400 text-sm tracking-widest uppercase" data-aos="fade-up">Save The Date</span>
-                <h2 class="font-['Great_Vibes',cursive] text-5xl text-amber-200 mt-2 mb-16" data-aos="fade-up">Rangkaian Acara</h2>
+                <span class="text-sky-400 text-sm tracking-widest uppercase" data-aos="fade-up">Save The Date</span>
+                <h2 class="font-['Great_Vibes',cursive] text-5xl text-sky-100 mt-2 mb-16" data-aos="fade-up">Rangkaian Acara</h2>
                 
                 <div class="grid md:grid-cols-2 gap-8">
                     <!-- Akad -->
-                    <div class="bg-stone-900 p-8 rounded-3xl border border-amber-500/30 shadow-xl" data-aos="fade-up">
-                        <h3 class="text-2xl font-bold text-amber-200 mb-4">Akad Nikah</h3>
-                        <p class="text-stone-300 font-medium mb-2"><i class="fa-regular fa-calendar-days text-amber-500 mr-2"></i> Minggu, 15 November 2026</p>
-                        <p class="text-stone-300 font-medium mb-4"><i class="fa-regular fa-clock text-amber-500 mr-2"></i> 08.00 WIB - Selesai</p>
-                        <p class="text-stone-400 text-sm mb-6">Gedung Pernikahan Yogyakarta</p>
-                        <a href="https://maps.google.com" target="_blank" class="inline-flex items-center gap-2 px-5 py-2.5 bg-amber-600 hover:bg-amber-500 text-stone-950 font-semibold rounded-xl text-sm transition">
+                    <div class="bg-slate-950 p-8 rounded-3xl border border-sky-500/20 shadow-xl" data-aos="fade-up">
+                        <h3 class="text-2xl font-bold text-sky-200 mb-4">Akad Nikah</h3>
+                        <p class="text-slate-300 font-medium mb-2"><i class="fa-regular fa-calendar-days text-sky-400 mr-2"></i> Minggu, 15 November 2026</p>
+                        <p class="text-slate-300 font-medium mb-4"><i class="fa-regular fa-clock text-sky-400 mr-2"></i> 08.00 WIB - Selesai</p>
+                        <p class="text-slate-400 text-sm mb-6">Gedung Pernikahan Yogyakarta</p>
+                        <a href="https://maps.google.com" target="_blank" class="inline-flex items-center gap-2 px-5 py-2.5 bg-sky-600 hover:bg-sky-500 text-white font-semibold rounded-xl text-sm transition">
                             <i class="fa-solid fa-location-dot"></i> Buka Google Maps
                         </a>
                     </div>
 
                     <!-- Resepsi -->
-                    <div class="bg-stone-900 p-8 rounded-3xl border border-amber-500/30 shadow-xl" data-aos="fade-up" data-aos-delay="200">
-                        <h3 class="text-2xl font-bold text-amber-200 mb-4">Resepsi</h3>
-                        <p class="text-stone-300 font-medium mb-2"><i class="fa-regular fa-calendar-days text-amber-500 mr-2"></i> Minggu, 15 November 2026</p>
-                        <p class="text-stone-300 font-medium mb-4"><i class="fa-regular fa-clock text-amber-500 mr-2"></i> 11.00 - 14.00 WIB</p>
-                        <p class="text-stone-400 text-sm mb-6">Gedung Pernikahan Yogyakarta</p>
-                        <a href="https://maps.google.com" target="_blank" class="inline-flex items-center gap-2 px-5 py-2.5 bg-amber-600 hover:bg-amber-500 text-stone-950 font-semibold rounded-xl text-sm transition">
+                    <div class="bg-slate-950 p-8 rounded-3xl border border-sky-500/20 shadow-xl" data-aos="fade-up" data-aos-delay="200">
+                        <h3 class="text-2xl font-bold text-sky-200 mb-4">Resepsi</h3>
+                        <p class="text-slate-300 font-medium mb-2"><i class="fa-regular fa-calendar-days text-sky-400 mr-2"></i> Minggu, 15 November 2026</p>
+                        <p class="text-slate-300 font-medium mb-4"><i class="fa-regular fa-clock text-sky-400 mr-2"></i> 11.00 - 14.00 WIB</p>
+                        <p class="text-slate-400 text-sm mb-6">Gedung Pernikahan Yogyakarta</p>
+                        <a href="https://maps.google.com" target="_blank" class="inline-flex items-center gap-2 px-5 py-2.5 bg-sky-600 hover:bg-sky-500 text-white font-semibold rounded-xl text-sm transition">
                             <i class="fa-solid fa-location-dot"></i> Buka Google Maps
                         </a>
                     </div>
@@ -133,60 +232,60 @@
         </section>
 
         <!-- GALLERY PHOTO & VIDEO -->
-        <section class="py-24 px-4 bg-stone-900">
+        <section class="py-24 px-4 bg-slate-950">
             <div class="max-w-4xl mx-auto text-center">
-                <span class="text-amber-400 text-sm tracking-widest uppercase" data-aos="fade-up">Moments</span>
-                <h2 class="font-['Great_Vibes',cursive] text-5xl text-amber-200 mt-2 mb-12" data-aos="fade-up">Galeri Kenangan</h2>
+                <span class="text-sky-400 text-sm tracking-widest uppercase" data-aos="fade-up">Moments</span>
+                <h2 class="font-['Great_Vibes',cursive] text-5xl text-sky-100 mt-2 mb-12" data-aos="fade-up">Galeri Kenangan</h2>
                 
                 <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
-                    <div class="overflow-hidden rounded-2xl h-48 border border-stone-800" data-aos="zoom-in"><img src="assets/images/gallery-1.jpg" alt="Gallery" class="w-full h-full object-cover hover:scale-110 transition duration-500"></div>
-                    <div class="overflow-hidden rounded-2xl h-48 border border-stone-800" data-aos="zoom-in" data-aos-delay="100"><img src="assets/images/gallery-2.jpg" alt="Gallery" class="w-full h-full object-cover hover:scale-110 transition duration-500"></div>
-                    <div class="overflow-hidden rounded-2xl h-48 border border-stone-800 col-span-2 md:col-span-1" data-aos="zoom-in" data-aos-delay="200"><img src="assets/images/gallery-3.jpg" alt="Gallery" class="w-full h-full object-cover hover:scale-110 transition duration-500"></div>
+                    <div class="overflow-hidden rounded-2xl h-48 border border-slate-800" data-aos="zoom-in"><img src="assets/images/gallery-1.jpg" alt="Gallery" class="w-full h-full object-cover hover:scale-110 transition duration-500"></div>
+                    <div class="overflow-hidden rounded-2xl h-48 border border-slate-800" data-aos="zoom-in" data-aos-delay="100"><img src="assets/images/gallery-2.jpg" alt="Gallery" class="w-full h-full object-cover hover:scale-110 transition duration-500"></div>
+                    <div class="overflow-hidden rounded-2xl h-48 border border-slate-800 col-span-2 md:col-span-1" data-aos="zoom-in" data-aos-delay="200"><img src="assets/images/gallery-3.jpg" alt="Gallery" class="w-full h-full object-cover hover:scale-110 transition duration-500"></div>
                 </div>
             </div>
         </section>
 
         <!-- RSVP & DIGITAL GIFT -->
-        <section class="py-24 px-4 bg-stone-950">
+        <section class="py-24 px-4 bg-slate-900">
             <div class="max-w-2xl mx-auto">
                 <div class="text-center mb-12" data-aos="fade-up">
-                    <span class="text-amber-400 text-sm tracking-widest uppercase">Participation</span>
-                    <h2 class="font-['Great_Vibes',cursive] text-5xl text-amber-200 mt-2">RSVP & Amplop Digital</h2>
+                    <span class="text-sky-400 text-sm tracking-widest uppercase">Participation</span>
+                    <h2 class="font-['Great_Vibes',cursive] text-5xl text-sky-100 mt-2">RSVP & Amplop Digital</h2>
                 </div>
 
                 <!-- RSVP Form -->
-                <form id="rsvp-form" class="bg-stone-900 p-8 rounded-3xl border border-stone-800 shadow-xl mb-12 space-y-6" data-aos="fade-up">
-                    <h3 class="text-xl font-bold text-amber-200 mb-4"><i class="fa-solid fa-address-book text-amber-500 mr-2"></i> Konfirmasi Kehadiran</h3>
+                <form id="rsvp-form" class="bg-slate-950 p-8 rounded-3xl border border-slate-800 shadow-xl mb-12 space-y-6" data-aos="fade-up">
+                    <h3 class="text-xl font-bold text-sky-200 mb-4"><i class="fa-solid fa-address-book text-sky-400 mr-2"></i> Konfirmasi Kehadiran</h3>
                     <div>
-                        <label class="block text-sm text-stone-300 mb-2 font-medium">Nama Lengkap</label>
-                        <input type="text" id="rsvp-name" required class="w-full bg-stone-800 border border-stone-700 rounded-xl px-4 py-3 text-stone-100 focus:outline-none focus:border-amber-500">
+                        <label class="block text-sm text-slate-300 mb-2 font-medium">Nama Lengkap</label>
+                        <input type="text" id="rsvp-name" required class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-slate-100 focus:outline-none focus:border-sky-500">
                     </div>
                     <div class="grid grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-sm text-stone-300 mb-2 font-medium">Kehadiran</label>
-                            <select id="rsvp-status" class="w-full bg-stone-800 border border-stone-700 rounded-xl px-4 py-3 text-stone-100 focus:outline-none focus:border-amber-500">
+                            <label class="block text-sm text-slate-300 mb-2 font-medium">Kehadiran</label>
+                            <select id="rsvp-status" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-slate-100 focus:outline-none focus:border-sky-500">
                                 <option value="Hadir">Hadir</option>
                                 <option value="Berhalangan">Berhalangan</option>
                             </select>
                         </div>
                         <div>
-                            <label class="block text-sm text-stone-300 mb-2 font-medium">Jumlah Tamu</label>
-                            <input type="number" id="rsvp-jumlah" min="1" max="5" value="1" class="w-full bg-stone-800 border border-stone-700 rounded-xl px-4 py-3 text-stone-100 focus:outline-none focus:border-amber-500">
+                            <label class="block text-sm text-slate-300 mb-2 font-medium">Jumlah Tamu</label>
+                            <input type="number" id="rsvp-jumlah" min="1" max="5" value="1" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-slate-100 focus:outline-none focus:border-sky-500">
                         </div>
                     </div>
-                    <button type="submit" class="w-full py-3.5 bg-amber-600 hover:bg-amber-500 text-stone-950 font-bold rounded-xl transition">Kirim Konfirmasi</button>
+                    <button type="submit" class="w-full py-3.5 bg-sky-600 hover:bg-sky-500 text-white font-bold rounded-xl transition">Kirim Konfirmasi</button>
                 </form>
 
                 <!-- Wedding Gift -->
-                <div class="bg-stone-900 p-8 rounded-3xl border border-stone-800 shadow-xl text-center space-y-6" data-aos="fade-up">
-                    <h3 class="text-xl font-bold text-amber-200"><i class="fa-solid fa-gift text-amber-500 mr-2"></i> Amplop Digital</h3>
-                    <p class="text-stone-400 text-sm">Doa restu Anda merupakan karunia terindah bagi kami. Jika ingin mengirimkan tanda kasih, dapat melalui:</p>
+                <div class="bg-slate-950 p-8 rounded-3xl border border-slate-800 shadow-xl text-center space-y-6" data-aos="fade-up">
+                    <h3 class="text-xl font-bold text-sky-200"><i class="fa-solid fa-gift text-sky-400 mr-2"></i> Amplop Digital</h3>
+                    <p class="text-slate-400 text-sm">Doa restu Anda merupakan karunia terindah bagi kami. Jika ingin mengirimkan tanda kasih, dapat melalui:</p>
                     
-                    <div class="bg-stone-800/60 p-6 rounded-2xl border border-stone-700/50 max-w-md mx-auto text-left">
-                        <p class="text-xs text-amber-400 font-bold tracking-widest uppercase">BCA</p>
-                        <p class="text-lg font-bold text-stone-100 mt-1">1234567890</p>
-                        <p class="text-sm text-stone-400">a.n. Aditya Putera Prakosa</p>
-                        <button onclick="navigator.clipboard.writeText('1234567890'); alert('Nomor rekening berhasil disalin!');" class="mt-4 px-4 py-2 bg-stone-700 hover:bg-stone-600 text-xs font-semibold rounded-lg text-stone-200 transition">
+                    <div class="bg-slate-900/80 p-6 rounded-2xl border border-slate-800 max-w-md mx-auto text-left">
+                        <p class="text-xs text-sky-400 font-bold tracking-widest uppercase">BCA</p>
+                        <p class="text-lg font-bold text-slate-100 mt-1">1234567890</p>
+                        <p class="text-sm text-slate-400">a.n. Aditya Putera Prakosa</p>
+                        <button onclick="navigator.clipboard.writeText('1234567890'); alert('Nomor rekening berhasil disalin!');" class="mt-4 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-xs font-semibold rounded-lg text-slate-200 transition border border-slate-700">
                             <i class="fa-regular fa-copy mr-1"></i> Salin Rekening
                         </button>
                     </div>
@@ -195,43 +294,43 @@
         </section>
 
         <!-- DIGITAL GUESTBOOK -->
-        <section class="py-24 px-4 bg-stone-900">
+        <section class="py-24 px-4 bg-slate-950">
             <div class="max-w-2xl mx-auto">
                 <div class="text-center mb-12" data-aos="fade-up">
-                    <span class="text-amber-400 text-sm tracking-widest uppercase">Wishes</span>
-                    <h2 class="font-['Great_Vibes',cursive] text-5xl text-amber-200 mt-2">Buku Tamu & Ucapan</h2>
+                    <span class="text-sky-400 text-sm tracking-widest uppercase">Wishes</span>
+                    <h2 class="font-['Great_Vibes',cursive] text-5xl text-sky-100 mt-2">Buku Tamu & Ucapan</h2>
                 </div>
 
                 <!-- Guestbook Form -->
-                <form id="guestbook-form" class="bg-stone-950 p-8 rounded-3xl border border-stone-800 shadow-xl mb-10 space-y-6" data-aos="fade-up">
+                <form id="guestbook-form" class="bg-slate-900 p-8 rounded-3xl border border-slate-800 shadow-xl mb-10 space-y-6" data-aos="fade-up">
                     <div>
-                        <label class="block text-sm text-stone-300 mb-2 font-medium">Nama</label>
-                        <input type="text" id="gb-name" required class="w-full bg-stone-900 border border-stone-700 rounded-xl px-4 py-3 text-stone-100 focus:outline-none focus:border-amber-500">
+                        <label class="block text-sm text-slate-300 mb-2 font-medium">Nama</label>
+                        <input type="text" id="gb-name" required class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-slate-100 focus:outline-none focus:border-sky-500">
                     </div>
                     <div>
-                        <label class="block text-sm text-stone-300 mb-2 font-medium">Ucapan & Doa</label>
-                        <textarea id="gb-message" rows="4" required class="w-full bg-stone-900 border border-stone-700 rounded-xl px-4 py-3 text-stone-100 focus:outline-none focus:border-amber-500"></textarea>
+                        <label class="block text-sm text-slate-300 mb-2 font-medium">Ucapan & Doa</label>
+                        <textarea id="gb-message" rows="4" required class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-slate-100 focus:outline-none focus:border-sky-500"></textarea>
                     </div>
-                    <button type="submit" class="w-full py-3.5 bg-amber-600 hover:bg-amber-500 text-stone-950 font-bold rounded-xl transition">Kirim Ucapan</button>
+                    <button type="submit" class="w-full py-3.5 bg-sky-600 hover:bg-sky-500 text-white font-bold rounded-xl transition">Kirim Ucapan</button>
                 </form>
 
                 <!-- Comments List -->
                 <div id="comments-container" class="space-y-4 max-h-[400px] overflow-y-auto pr-2">
-                    <div class="bg-stone-950 p-6 rounded-2xl border border-stone-800">
+                    <div class="bg-slate-900 p-6 rounded-2xl border border-slate-800">
                         <div class="flex justify-between items-center mb-2">
-                            <h4 class="font-bold text-amber-200">Budi Santoso</h4>
-                            <span class="text-xs text-stone-500">Baru saja</span>
+                            <h4 class="font-bold text-sky-200">Budi Santoso</h4>
+                            <span class="text-xs text-slate-500">Baru saja</span>
                         </div>
-                        <p class="text-stone-300 text-sm">Selamat menempuh hidup baru Ditya & Diva! Semoga menjadi keluarga sakinah, mawaddah, warahmah.</p>
+                        <p class="text-slate-300 text-sm">Selamat menempuh hidup baru Ditya & Diva! Semoga menjadi keluarga sakinah, mawaddah, warahmah.</p>
                     </div>
                 </div>
             </div>
         </section>
 
         <!-- FOOTER -->
-        <footer class="py-12 bg-stone-950 text-center border-t border-stone-800 px-4">
-            <h2 class="font-['Great_Vibes',cursive] text-4xl text-amber-200 mb-2">Ditya & Diva</h2>
-            <p class="text-stone-500 text-sm">Terima kasih atas doa & kehadiran Bapak/Ibu/Saudara/i sekalian.</p>
+        <footer class="py-12 bg-slate-950 text-center border-t border-slate-900 px-4">
+            <h2 class="font-['Great_Vibes',cursive] text-4xl text-sky-200 mb-2">Ditya & Diva</h2>
+            <p class="text-slate-500 text-sm">Terima kasih atas doa & kehadiran Bapak/Ibu/Saudara/i sekalian.</p>
         </footer>
     </main>
 
