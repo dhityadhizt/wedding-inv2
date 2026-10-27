@@ -18,7 +18,7 @@ window.addEventListener('DOMContentLoaded', () => {
         guestNameElement.textContent = "Bapak/Ibu/Saudara/i";
     }
 
-    init3DStickerParallax();
+    init3DGyroAndParallax();
     initPetalCanvas();
     fetchWeddingData();
     fetchComments();
@@ -76,7 +76,7 @@ async function fetchComments() {
             container.innerHTML = "";
             result.comments.forEach(c => {
                 const div = document.createElement('div');
-                div.className = "bg-slate-900 p-6 rounded-2xl border border-slate-800";
+                div.className = "bg-slate-950 p-6 rounded-2xl border border-slate-800";
                 div.innerHTML = `
                     <div class="flex justify-between items-center mb-2">
                         <h4 class="font-bold text-ice-200">${escapeHtml(c.name)}</h4>
@@ -90,22 +90,58 @@ async function fetchComments() {
     } catch (e) { console.log("Gagal memuat komentar:", e); }
 }
 
-// 3D Parallax & Petal Canvas
-function init3DStickerParallax() {
-    const cover = document.getElementById('cover'), card = document.getElementById('welcome-card'), stickers = document.querySelectorAll('.sticker-element');
+// 3D Parallax & Gyroscope Motion for Or1.png and Card
+function init3DGyroAndParallax() {
+    const cover = document.getElementById('cover');
+    const card = document.getElementById('welcome-card');
+    const layers = document.querySelectorAll('.gyro-layer');
     if (!cover || !card) return;
+
+    let targetX = 0, targetY = 0;
+    let currentX = 0, currentY = 0;
+
+    // Mouse Move Event
     cover.addEventListener('mousemove', (e) => {
-        const x = (e.clientX / window.innerWidth) - 0.5, y = (e.clientY / window.innerHeight) - 0.5;
-        card.style.transform = `perspective(1000px) rotateY(${x * 10}deg) rotateX(${-y * 10}deg)`;
-        stickers.forEach(s => {
-            const depth = parseFloat(s.getAttribute('data-depth')) || 0.05;
-            s.style.transform = `translate3d(${x * depth * 300}px, ${y * depth * 300}px, 0px)`;
-        });
+        targetX = (e.clientX / window.innerWidth) - 0.5;
+        targetY = (e.clientY / window.innerHeight) - 0.5;
     });
+
     cover.addEventListener('mouseleave', () => {
-        card.style.transform = `perspective(1000px) rotateY(0deg) rotateX(0deg)`;
-        stickers.forEach(s => s.style.transform = `translate3d(0,0,0)`);
+        targetX = 0;
+        targetY = 0;
     });
+
+    // Device Orientation (Gyroscope) Event for Mobile
+    if (window.DeviceOrientationEvent) {
+        window.addEventListener('deviceorientation', (e) => {
+            if (e.gamma !== null && e.beta !== null) {
+                // gamma: left to right (-90 to 90)
+                // beta: front to back (-180 to 180)
+                targetX = Math.max(Math.min(e.gamma / 30, 0.5), -0.5);
+                targetY = Math.max(Math.min((e.beta - 45) / 30, 0.5), -0.5);
+            }
+        });
+    }
+
+    // Smooth Animation Loop (Lerp)
+    function animate() {
+        currentX += (targetX - currentX) * 0.1;
+        currentY += (targetY - currentY) * 0.1;
+
+        // Tilt Card
+        card.style.transform = `perspective(1000px) rotateY(${currentX * 12}deg) rotateX(${-currentY * 12}deg)`;
+
+        // Parallax & Gyro shift on layers (Or1.png ornaments)
+        layers.forEach(layer => {
+            const depth = parseFloat(layer.getAttribute('data-depth')) || 0.05;
+            const moveX = currentX * depth * 500;
+            const moveY = currentY * depth * 500;
+            layer.style.transform = `translate3d(${moveX}px, ${moveY}px, 0px)`;
+        });
+
+        requestAnimationFrame(animate);
+    }
+    animate();
 }
 
 function initPetalCanvas() {
@@ -115,24 +151,24 @@ function initPetalCanvas() {
     let w = canvas.width = window.innerWidth, h = canvas.height = window.innerHeight;
     window.addEventListener('resize', () => { w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight; });
     
-    const petals = Array.from({length: 20}, () => ({
-        x: Math.random() * w, y: Math.random() * h - h, size: Math.random() * 8 + 5,
-        speedY: Math.random() * 1 + 0.5, speedX: Math.random() * 0.6 - 0.3, rot: Math.random() * 360
+    const petals = Array.from({length: 22}, () => ({
+        x: Math.random() * w, y: Math.random() * h - h, size: Math.random() * 8 + 4,
+        speedY: Math.random() * 0.8 + 0.4, speedX: Math.random() * 0.5 - 0.25, rot: Math.random() * 360
     }));
 
-    function animate() {
+    function animatePetals() {
         ctx.clearRect(0, 0, w, h);
         petals.forEach(p => {
-            p.y += p.speedY; p.x += p.speedX; p.rot += 1;
+            p.y += p.speedY; p.x += p.speedX; p.rot += 0.8;
             if (p.y > h + 10) { p.y = -10; p.x = Math.random() * w; }
             ctx.save(); ctx.translate(p.x, p.y); ctx.rotate((p.rot * Math.PI) / 180);
-            ctx.fillStyle = 'rgba(224, 242, 254, 0.7)';
+            ctx.fillStyle = 'rgba(186, 218, 242, 0.8)';
             ctx.fillRect(0, 0, p.size, p.size);
             ctx.restore();
         });
-        requestAnimationFrame(animate);
+        requestAnimationFrame(animatePetals);
     }
-    animate();
+    animatePetals();
 }
 
 // Countdown
@@ -218,6 +254,7 @@ document.getElementById('guestbook-form').addEventListener('submit', async (e) =
         e.target.reset();
         setTimeout(fetchComments, 1500);
     } catch (err) {
+        asset = "Terjadi kesalahan koneksi.";
         alert("Terjadi kesalahan koneksi.");
     } finally {
         btn.textContent = "Kirim Ucapan"; btn.disabled = false;
