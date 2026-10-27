@@ -1,4 +1,11 @@
-body {
+/* Pengaturan Dasar & Kustomisasi Scrollbar */
+body, html {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    min-height: 100vh;
+    font-family: 'Playfair Display', serif;
+    overflow-x: hidden;
     background-color: #020617;
     color: #f8fafc;
 }
@@ -8,6 +15,39 @@ body {
 ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
 ::-webkit-scrollbar-thumb:hover { background: #0284c7; }
 
+/* Efek Smooth Parallax Background */
+.main-invitation-page {
+    position: relative;
+    width: 100%;
+    min-height: 100vh;
+    background-image: url('../images/background.jpg'); /* Sesuaikan path folder Anda */
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px 20px;
+    box-sizing: border-box;
+}
+
+/* Bingkai Konten Utama & Efek Glow Pulse */
+.invitation-card-container, #welcome-card {
+    position: relative;
+    max-width: 600px;
+    width: 100%;
+    background: rgba(15, 23, 42, 0.85); /* Disesuaikan dengan nuansa dark mode */
+    backdrop-filter: blur(10px);
+    border: 2px solid #334155;
+    border-radius: 20px;
+    padding: 50px 30px;
+    text-align: center;
+    box-shadow: 0 15px 50px -10px rgba(27, 100, 170, 0.2);
+    z-index: 2;
+    animation: glowPulse 5s infinite ease-in-out;
+}
+
+/* Animasi & Layer Giroskop */
 @keyframes floatSlow {
     0%, 100% { transform: translateY(0px) rotate(0deg); }
     50% { transform: translateY(-10px) rotate(2deg); }
@@ -18,20 +58,49 @@ body {
     50% { transform: translateY(10px) rotate(-2deg); }
 }
 
-.gyro-layer {
-    animation: floatSlow 6s ease-in-out infinite;
-    transform-style: preserve-3d;
-    will-change: transform;
-}
-.gyro-layer:nth-child(even) {
-    animation: floatReverse 7s ease-in-out infinite;
-}
-
 @keyframes glowPulse {
     0%, 100% { box-shadow: 0 15px 50px -10px rgba(27, 100, 170, 0.2); }
     50% { box-shadow: 0 25px 70px -5px rgba(84, 158, 225, 0.35); }
 }
 
-#welcome-card {
-    animation: glowPulse 5s infinite ease-in-out;
+.floating-ornament {
+    position: absolute;
+    width: 130px;
+    pointer-events: none;
+    z-index: 3;
+    transform-style: preserve-3d;
+    will-change: transform;
+    transition: transform 0.1s ease-out;
+}
+
+.ornament-left {
+    top: 5%;
+    left: -35px;
+    animation: floatSlow 6s ease-in-out infinite;
+}
+
+.ornament-right {
+    bottom: 5%;
+    right: -35px;
+    animation: floatReverse 7s ease-in-out infinite;
+}
+
+/* Tipografi di dalam Card */
+.invitation-card-container h2 {
+    font-size: 1.8rem;
+    color: #38bdf8;
+    margin-bottom: 10px;
+    letter-spacing: 2px;
+}
+
+.invitation-card-container h1 {
+    font-size: 2.5rem;
+    color: #f8fafc;
+    margin: 15px 0;
+}
+
+.invitation-card-container p {
+    font-size: 1rem;
+    color: #94a3b8;
+    line-height: 1.6;
 }
